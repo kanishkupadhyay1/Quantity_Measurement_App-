@@ -24,31 +24,43 @@ public class Quantity_Measurement_App {
         }
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    static class Inches {
+        private final double value;
 
-        try {
-            System.out.print("Enter first value in feet: ");
-            double val1 = scanner.nextDouble();
-
-            System.out.print("Enter second value in feet: ");
-            double val2 = scanner.nextDouble();
-
-            Feet feet1 = new Feet(val1);
-            Feet feet2 = new Feet(val2);
-
-            boolean result = feet1.equals(feet2);
-
-            if (result) {
-                System.out.println("Equal (true)");
-            } else {
-                System.out.println("Not Equal (false)");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Invalid input! Please enter numeric values only.");
-        } finally {
-            scanner.close();
+        public Inches(double value) {
+            this.value = value;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+
+            Inches other = (Inches) obj;
+            return Double.compare(this.value, other.value) == 0;
+        }
+    }
+    public static boolean compareFeet(double v1, double v2) {
+        Feet f1 = new Feet(v1);
+        Feet f2 = new Feet(v2);
+        return f1.equals(f2);
+    }
+
+    public static boolean compareInches(double v1, double v2) {
+        Inches i1 = new Inches(v1);
+        Inches i2 = new Inches(v2);
+        return i1.equals(i2);
+    }
+
+
+    public static void main(String[] args) {
+
+        // Feet comparison
+        boolean feetResult = compareFeet(1.0, 1.0);
+        System.out.println("Feet Comparison: " + (feetResult ? "Equal (true)" : "Not Equal (false)"));
+
+        // Inches comparison
+        boolean inchResult = compareInches(1.0, 1.0);
+        System.out.println("Inches Comparison: " + (inchResult ? "Equal (true)" : "Not Equal (false)"));
     }
 }

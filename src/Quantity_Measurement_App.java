@@ -4,9 +4,9 @@ public class Quantity_Measurement_App {
 
     enum LengthUnit {
         FEET(1.0),
-        INCHES(1.0 / 12.0),     // 1 inch = 1/12 feet
-        YARDS(3.0),             // 1 yard = 3 feet
-        CENTIMETERS(0.0328084); // 1 cm = 0.0328084 feet
+        INCHES(1.0 / 12.0),
+        YARDS(3.0),
+        CENTIMETERS(0.0328084);
 
         private final double toFeetFactor;
 
@@ -16,6 +16,10 @@ public class Quantity_Measurement_App {
 
         public double toFeet(double value) {
             return value * toFeetFactor;
+        }
+
+        public double fromFeet(double feetValue) {
+            return feetValue / toFeetFactor;
         }
     }
 
@@ -28,12 +32,38 @@ public class Quantity_Measurement_App {
             if (unit == null) {
                 throw new IllegalArgumentException("Unit cannot be null");
             }
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Invalid numeric value");
+            }
             this.value = value;
             this.unit = unit;
         }
 
         private double toFeet() {
             return unit.toFeet(value);
+        }
+
+        private QuantityLength addInternal(QuantityLength other, LengthUnit targetUnit) {
+            double sumInFeet = this.toFeet() + other.toFeet();
+            double resultValue = targetUnit.fromFeet(sumInFeet);
+            return new QuantityLength(resultValue, targetUnit);
+        }
+
+        public QuantityLength add(QuantityLength other) {
+            if (other == null) {
+                throw new IllegalArgumentException("Second operand cannot be null");
+            }
+            return addInternal(other, this.unit);
+        }
+
+        public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
+            if (other == null) {
+                throw new IllegalArgumentException("Second operand cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
+            return addInternal(other, targetUnit);
         }
 
         @Override
@@ -44,50 +74,61 @@ public class Quantity_Measurement_App {
             QuantityLength other = (QuantityLength) obj;
             return Math.abs(this.toFeet() - other.toFeet()) < EPSILON;
         }
+
+        @Override
+        public String toString() {
+            return "Quantity(" + value + ", " + unit + ")";
+        }
     }
 
     public static void main(String[] args) {
 
-        System.out.println("Yard to Feet: " +
+        System.out.println(
+                new QuantityLength(1.0, LengthUnit.FEET)
+                        .add(new QuantityLength(12.0, LengthUnit.INCHES), LengthUnit.FEET)
+        );
+
+        System.out.println(
+                new QuantityLength(1.0, LengthUnit.FEET)
+                        .add(new QuantityLength(12.0, LengthUnit.INCHES), LengthUnit.INCHES)
+        );
+
+        System.out.println(
+                new QuantityLength(1.0, LengthUnit.FEET)
+                        .add(new QuantityLength(12.0, LengthUnit.INCHES), LengthUnit.YARDS)
+        );
+
+        System.out.println(
                 new QuantityLength(1.0, LengthUnit.YARDS)
-                        .equals(new QuantityLength(3.0, LengthUnit.FEET)));
+                        .add(new QuantityLength(3.0, LengthUnit.FEET), LengthUnit.YARDS)
+        );
 
-        System.out.println("Yard to Inches: " +
-                new QuantityLength(1.0, LengthUnit.YARDS)
-                        .equals(new QuantityLength(36.0, LengthUnit.INCHES)));
+        System.out.println(
+                new QuantityLength(36.0, LengthUnit.INCHES)
+                        .add(new QuantityLength(1.0, LengthUnit.YARDS), LengthUnit.FEET)
+        );
 
-        System.out.println("CM to Inches: " +
-                new QuantityLength(1.0, LengthUnit.CENTIMETERS)
-                        .equals(new QuantityLength(0.393701, LengthUnit.INCHES)));
+        System.out.println(
+                new QuantityLength(2.54, LengthUnit.CENTIMETERS)
+                        .add(new QuantityLength(1.0, LengthUnit.INCHES), LengthUnit.CENTIMETERS)
+        );
 
-        System.out.println("Yard same: " +
-                new QuantityLength(2.0, LengthUnit.YARDS)
-                        .equals(new QuantityLength(2.0, LengthUnit.YARDS)));
+        System.out.println(
+                new QuantityLength(5.0, LengthUnit.FEET)
+                        .add(new QuantityLength(0.0, LengthUnit.INCHES), LengthUnit.YARDS)
+        );
 
-        System.out.println("Yard different: " +
-                new QuantityLength(1.0, LengthUnit.YARDS)
-                        .equals(new QuantityLength(2.0, LengthUnit.YARDS)));
+        System.out.println(
+                new QuantityLength(5.0, LengthUnit.FEET)
+                        .add(new QuantityLength(-2.0, LengthUnit.FEET), LengthUnit.INCHES)
+        );
 
-        System.out.println("CM to CM: " +
-                new QuantityLength(2.0, LengthUnit.CENTIMETERS)
-                        .equals(new QuantityLength(2.0, LengthUnit.CENTIMETERS)));
+        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET)
+                .add(new QuantityLength(12.0, LengthUnit.INCHES), LengthUnit.YARDS);
 
-        System.out.println("CM  to Feet: " +
-                new QuantityLength(1.0, LengthUnit.CENTIMETERS)
-                        .equals(new QuantityLength(1.0, LengthUnit.FEET)));
+        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES)
+                .add(new QuantityLength(1.0, LengthUnit.FEET), LengthUnit.YARDS);
 
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.YARDS);
-        QuantityLength b = new QuantityLength(3.0, LengthUnit.FEET);
-        QuantityLength c = new QuantityLength(36.0, LengthUnit.INCHES);
-
-        System.out.println("Transitive (A=B, B=C, A=C): " +
-                (a.equals(b) && b.equals(c) && a.equals(c)));
-
-        System.out.println("Compare with null: " +
-                new QuantityLength(1.0, LengthUnit.YARDS).equals(null));
-
-        // Same reference
-        QuantityLength ref = new QuantityLength(5.0, LengthUnit.FEET);
-        System.out.println("Same reference: " + ref.equals(ref));
+        System.out.println(a.equals(b));
     }
 }

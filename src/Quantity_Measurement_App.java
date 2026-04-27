@@ -72,7 +72,7 @@ public class Quantity_Measurement_App {
                 new QuantityLength(2.0, LengthUnit.CENTIMETERS)
                         .equals(new QuantityLength(2.0, LengthUnit.CENTIMETERS)));
 
-        System.out.println("CM to Feet: " +
+        System.out.println("CM  to Feet: " +
                 new QuantityLength(1.0, LengthUnit.CENTIMETERS)
                         .equals(new QuantityLength(1.0, LengthUnit.FEET)));
 

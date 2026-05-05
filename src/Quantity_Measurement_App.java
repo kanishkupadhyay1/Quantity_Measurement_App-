@@ -96,5 +96,39 @@ public class Quantity_Measurement_App {
 
         System.out.println(v1.divide(v5));
 // Expected: 10.0
+
+        // Subtraction (UC12 functionality via UC13 refactored logic)
+        System.out.println(
+                new Quantity<>(10.0, WeightUnit.KILOGRAM)
+                        .subtract(new Quantity<>(5000.0, WeightUnit.GRAM))
+        );
+
+        System.out.println(
+                new Quantity<>(5.0, VolumeUnit.LITRE)
+                        .subtract(new Quantity<>(500.0, VolumeUnit.MILLILITRE))
+        );
+
+// Subtraction with explicit unit
+        System.out.println(
+                new Quantity<>(10.0, VolumeUnit.LITRE)
+                        .subtract(new Quantity<>(2.0, VolumeUnit.LITRE), VolumeUnit.MILLILITRE)
+        );
+
+// Division
+        System.out.println(
+                new Quantity<>(10.0, WeightUnit.KILOGRAM)
+                        .divide(new Quantity<>(5.0, WeightUnit.KILOGRAM))
+        );
+
+        System.out.println(
+                new Quantity<>(24.0, VolumeUnit.MILLILITRE)
+                        .divide(new Quantity<>(2.0, VolumeUnit.LITRE))
+        );
+
+// Edge case (optional demo)
+        System.out.println(
+                new Quantity<>(5.0, WeightUnit.KILOGRAM)
+                        .subtract(new Quantity<>(10.0, WeightUnit.KILOGRAM))
+        );
     }
 }

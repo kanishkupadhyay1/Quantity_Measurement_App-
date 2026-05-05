@@ -1,10 +1,10 @@
-public class QuantityWeight {
+public class Quantity<U extends IMeasurable> {
 
     private final double value;
-    private final WeightUnit unit;
+    private final U unit;
     private static final double EPSILON = 0.0001;
 
-    public QuantityWeight(double value, WeightUnit unit) {
+    public Quantity(double value, U unit) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
         }
@@ -19,29 +19,29 @@ public class QuantityWeight {
         return unit.convertToBaseUnit(value);
     }
 
-    public QuantityWeight convertTo(WeightUnit targetUnit) {
+    public Quantity<U> convertTo(U targetUnit) {
         if (targetUnit == null) {
             throw new IllegalArgumentException("Target unit cannot be null");
         }
         double base = this.toBaseUnit();
         double result = targetUnit.convertFromBaseUnit(base);
-        return new QuantityWeight(result, targetUnit);
+        return new Quantity<>(result, targetUnit);
     }
 
-    private QuantityWeight addInternal(QuantityWeight other, WeightUnit targetUnit) {
+    private Quantity<U> addInternal(Quantity<U> other, U targetUnit) {
         double sum = this.toBaseUnit() + other.toBaseUnit();
         double result = targetUnit.convertFromBaseUnit(sum);
-        return new QuantityWeight(result, targetUnit);
+        return new Quantity<>(result, targetUnit);
     }
 
-    public QuantityWeight add(QuantityWeight other) {
+    public Quantity<U> add(Quantity<U> other) {
         if (other == null) {
             throw new IllegalArgumentException("Second operand cannot be null");
         }
         return addInternal(other, this.unit);
     }
 
-    public QuantityWeight add(QuantityWeight other, WeightUnit targetUnit) {
+    public Quantity<U> add(Quantity<U> other, U targetUnit) {
         if (other == null) {
             throw new IllegalArgumentException("Second operand cannot be null");
         }
@@ -54,16 +54,22 @@ public class QuantityWeight {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (obj == null) return false;
 
-        QuantityWeight other = (QuantityWeight) obj;
+        if (!(obj instanceof Quantity<?>)) return false;
+
+        Quantity<?> other = (Quantity<?>) obj;
+
+        // Prevent cross-category comparison
+        if (this.unit.getClass() != other.unit.getClass()) return false;
+
         return Math.abs(this.toBaseUnit() - other.toBaseUnit()) < EPSILON;
     }
 
     @Override
     public int hashCode() {
         long bits = Double.doubleToLongBits(toBaseUnit());
-        return (int)(bits ^ (bits >>> 32));
+        return (int) (bits ^ (bits >>> 32));
     }
 
     @Override

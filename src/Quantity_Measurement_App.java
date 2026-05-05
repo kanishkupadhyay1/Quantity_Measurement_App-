@@ -66,5 +66,23 @@ public class Quantity_Measurement_App {
                 new Quantity<>(5.0, WeightUnit.KILOGRAM)
                         .add(new Quantity<>(-2000.0, WeightUnit.GRAM))
         );
+        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+        Quantity<VolumeUnit> v3 = new Quantity<>(1.0, VolumeUnit.GALLON);
+        System.out.println(v1.equals(v2)); // true
+
+        System.out.println(v1.convertTo(VolumeUnit.MILLILITRE));
+// Quantity(1000.0, MILLILITRE)
+
+        System.out.println(v1.add(v2));
+// Quantity(2.0, LITRE)
+
+        System.out.println(v3.convertTo(VolumeUnit.LITRE));
+// Quantity(3.78541, LITRE)
+
+        System.out.println(
+                v1.add(v3, VolumeUnit.MILLILITRE)
+        );
+// Quantity(4785.41, MILLILITRE)
     }
 }

@@ -84,5 +84,17 @@ public class Quantity_Measurement_App {
                 v1.add(v3, VolumeUnit.MILLILITRE)
         );
 // Quantity(4785.41, MILLILITRE)
+
+        Quantity<VolumeUnit> v4 = new Quantity<>(5.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v5 = new Quantity<>(500.0, VolumeUnit.MILLILITRE);
+
+        System.out.println(v4.subtract(v2));
+// Expected: Quantity(4.5, LITRE)
+
+        System.out.println(v1.subtract(v5, VolumeUnit.MILLILITRE));
+// Expected: Quantity(4500.0, MILLILITRE)
+
+        System.out.println(v1.divide(v5));
+// Expected: 10.0
     }
 }

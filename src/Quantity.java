@@ -4,6 +4,60 @@ public class Quantity<U extends IMeasurable> {
     private final U unit;
     private static final double EPSILON = 0.0001;
 
+    private Quantity<U> subtractInternal(Quantity<U> other, U targetUnit) {
+        double diff = this.toBaseUnit() - other.toBaseUnit();
+        double result = targetUnit.convertFromBaseUnit(diff);
+
+        // round to 2 decimal places
+        result = Math.round(result * 100.0) / 100.0;
+
+        return new Quantity<>(result, targetUnit);
+    }
+
+    public Quantity<U> subtract(Quantity<U> other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Second operand cannot be null");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Cannot subtract different measurement categories");
+        }
+
+        return subtractInternal(other, this.unit);
+    }
+
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        if (other == null) {
+            throw new IllegalArgumentException("Second operand cannot be null");
+        }
+
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Cannot subtract different measurement categories");
+        }
+
+        return subtractInternal(other, targetUnit);
+    }
+    public double divide(Quantity<U> other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Second operand cannot be null");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Cannot divide different measurement categories");
+        }
+
+        double divisor = other.toBaseUnit();
+
+        if (Math.abs(divisor) < 0.0000001) {
+            throw new ArithmeticException("Division by zero");
+        }
+
+        return this.toBaseUnit() / divisor;
+    }
     public Quantity(double value, U unit) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
@@ -77,3 +131,4 @@ public class Quantity<U extends IMeasurable> {
         return "Quantity(" + value + ", " + unit + ")";
     }
 }
+
